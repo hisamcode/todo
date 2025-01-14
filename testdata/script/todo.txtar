@@ -1,0 +1,75 @@
+# test add
+exec todo -add 'test'
+exec todo -list
+stdout 'No   Task   Complete'
+stdout '1    test   false'
+
+# test add stdin
+stdin input.txt
+exec todo -add 
+exec todo -list
+stdout 'No   Task     Complete'
+stdout '1    test     false'
+stdout '2    test 2   false'
+stdout '3    test 3   false'
+
+# test complete
+exec todo -complete 2
+exec todo -list
+stdout 'No   Task     Complete'
+stdout '1    test     false'
+stdout '2    test 2   true'
+stdout '3    test 3   false'
+
+# test hide complete
+exec todo -add 'baru'
+exec todo -list -hc
+stdout 'No   Task     Complete'
+stdout '1    test     false'
+stdout '3    test 3   false'
+stdout '4    baru     false'
+
+# test verbose
+exec todo -list -v
+stdout 'No   Task     Complete   Created At            Completed At'
+# how to test time Now ?????
+stdout '1    test     false      '
+stdout '2    test 2   true       '
+stdout '3    test 3   false      '
+stdout '4    baru     false      '
+
+# test verbose hide complete
+exec todo -list -v -hc
+stdout 'No   Task     Complete   Created At            Completed At'
+stdout '1    test     false      '
+stdout '3    test 3   false      '
+stdout '4    baru     false      '
+
+rm .todo.json
+
+# test environment
+env TODO_FILENAME=new-todo.json
+exec todo -add 'hello'
+! exists .todo.json
+exists new-todo.json
+rm new-todo.json
+
+# test delete
+env TODO_FILENAME=
+! exists .todo.json
+exec todo -add 'hello'
+exists .todo.json
+exec todo -add 'buat di delete'
+exec todo -add 'hai'
+exec todo -del 2
+exec todo -list
+stdout 'No   Task    Complete'
+stdout '1    hello   false'
+stdout '2    hai     false'
+
+
+-- input.txt --
+test 2
+test 3
+
+stop
